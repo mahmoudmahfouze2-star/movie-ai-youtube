@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Final Video</title>
+</head>
+<body style="background:#111;color:white;text-align:center">
+
+<h2>🎥 الفيديو جاهز</h2>
+
+<video id="player" controls width="80%"></video>
+<br><br>
+<a id="download" download>تحميل الفيديو</a>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const folder = params.get("folder");
+const file = `/outputs/${folder}/final_summary.mp4`;
+document.getElementById("player").src = file;
+document.getElementById("download").href = file;
+</script>
+
+</body>
+</html>

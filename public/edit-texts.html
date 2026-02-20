@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>تعديل النصوص</title>
+<style>
+body{background:#111;color:white;text-align:center}
+textarea{width:80%;height:60px;margin:10px;background:#222;color:white}
+button{padding:10px 20px}
+</style>
+</head>
+<body>
+
+<h2>✍️ عدل النصوص قبل التصدير</h2>
+
+<div id="texts"></div>
+
+<div style="margin-top:20px;">
+  <div style="width:80%;background:#333;margin:auto;height:20px;border-radius:10px;">
+    <div id="bar" style="width:0%;height:100%;background:#00BFFF;border-radius:10px;"></div>
+  </div>
+  <p id="percent">0%</p>
+</div>
+
+<button onclick="render()">إنشاء الفيديو النهائي</button>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const folder = params.get("folder");
+
+fetch(`/outputs/${folder}/texts.json`)
+.then(res=>res.json())
+.then(data=>{
+  data.forEach((t,i)=>{
+    document.getElementById("texts").innerHTML +=
+      `<textarea>${t}</textarea>`;
+  });
+});
+
+function render(){
+  const texts = Array.from(document.querySelectorAll("textarea"))
+    .map(t=>t.value);
+
+  fetch("/render-summary",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({folder,texts})
+  });
+
+  const interval = setInterval(()=>{
+    fetch("/progress")
+    .then(res=>res.json())
+    .then(data=>{
+      document.getElementById("bar").style.width = data.percent + "%";
+      document.getElementById("percent").innerText = data.percent + "%";
+      if(data.percent >= 100){
+        clearInterval(interval);
+        window.location.href=`/result.html?folder=${folder}`;
+      }
+    });
+  },1000);
+}
+</script>
+
+</body>
+</html>
